@@ -1,4 +1,4 @@
-Package: MetaPipeX_Update
+Package: MetaPipeX
 Type: Package
 Title: Standardizing data structure, analysis code & reporting for experimental data of between groups comparisons in replication projects
 Version: 0.1.0
