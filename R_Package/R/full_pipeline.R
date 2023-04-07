@@ -203,7 +203,7 @@ full_pipeline <- function(data, MultiLab = NULL, ReplicationProject = NULL, Repl
 
   ## 2. Step of Pipeline: create replication summaries
   if (is.null(output_path) == TRUE) {
-    output_list$Replication_Summaries <- MetaPipeX::create_replication_summaries(data = data,
+    output_list$Replication_Summaries <- MetaPipeXUpdate::create_replication_summaries(data = data,
                                                                                 MultiLab = {{MultiLab}},
                                                                                 ReplicationProject = {{ReplicationProject}},
                                                                                 Replication = {{Replication}},
@@ -211,7 +211,7 @@ full_pipeline <- function(data, MultiLab = NULL, ReplicationProject = NULL, Repl
                                                                                 Group = {{Group}},
                                                                                 suppress_list_output = FALSE)
   } else {
-    output_list$Replication_Summaries <- MetaPipeX::create_replication_summaries(data = data,
+    output_list$Replication_Summaries <- MetaPipeXUpdate::create_replication_summaries(data = data,
                                                                                 MultiLab = {{MultiLab}},
                                                                                 ReplicationProject = {{ReplicationProject}},
                                                                                 Replication = {{Replication}},
@@ -223,10 +223,10 @@ full_pipeline <- function(data, MultiLab = NULL, ReplicationProject = NULL, Repl
 
   ## 3. Step of Pipeline: merge replication summaries
   if (is.null(output_path) == TRUE) {
-    output_list$Merged_Replication_Summaries <- MetaPipeX::merge_replication_summaries(data = output_list$Replication_Summaries$Replication_Summaries,
+    output_list$Merged_Replication_Summaries <- MetaPipeXUpdate::merge_replication_summaries(data = output_list$Replication_Summaries$Replication_Summaries,
                                                                                       suppress_list_output = FALSE)
   } else {
-    output_list$Merged_Replication_Summaries <- MetaPipeX::merge_replication_summaries(data = output_list$Replication_Summaries$Replication_Summaries,
+    output_list$Merged_Replication_Summaries <- MetaPipeXUpdate::merge_replication_summaries(data = output_list$Replication_Summaries$Replication_Summaries,
                                                                                       output_folder = paste(MetaPipeX_folder, "/3_Merged_Replication_Summaries/", sep = ""),
                                                                                       suppress_list_output = FALSE)
   }
@@ -240,12 +240,12 @@ full_pipeline <- function(data, MultiLab = NULL, ReplicationProject = NULL, Repl
 
 
   if (is.null(output_path) == TRUE) {
-    output_list$Meta_Analyses <- MetaPipeX::meta_analyses(data = output_list$Merged_Replication_Summaries$Merged_Replication_Summaries,
+    output_list$Meta_Analyses <- MetaPipeXUpdate::meta_analyses(data = output_list$Merged_Replication_Summaries$Merged_Replication_Summaries,
                                                          suppress_list_output = FALSE,
                                                          method = method,
                                                          sparse = sparse)
   } else {
-    output_list$Meta_Analyses <- MetaPipeX::meta_analyses(data = output_list$Merged_Replication_Summaries$Merged_Replication_Summaries,
+    output_list$Meta_Analyses <- MetaPipeXUpdate::meta_analyses(data = output_list$Merged_Replication_Summaries$Merged_Replication_Summaries,
                                                          output_folder = paste(MetaPipeX_folder, "/4_Meta_Analyses/", sep = ""),
                                                          suppress_list_output = FALSE,
                                                          method = method,

@@ -777,7 +777,7 @@ just type it in the Search field and all lines containing that word will be disp
                                 })
 
                                 # run the pipeline function
-                                IPD_analzed <- MetaPipeX::full_pipeline(data = IPD_list,
+                                IPD_analzed <- MetaPipeXUpdate::full_pipeline(data = IPD_list,
                                                                         MultiLab = if(input$create_custom_multilab_col == TRUE){}else{input$multilab_col},
                                                                         ReplicationProject = if(input$create_custom_replicationproject_col == TRUE){}else{input$replicationproject_col},
                                                                         Replication = input$replication_col,
@@ -834,10 +834,10 @@ just type it in the Search field and all lines containing that word will be disp
                               style = "old",
                               {
                                 # merge the Replication summaries
-                                ReplicationSum_merged <- MetaPipeX::merge_replication_summaries(data = ReplicationSum_list)
+                                ReplicationSum_merged <- MetaPipeXUpdate::merge_replication_summaries(data = ReplicationSum_list)
 
                                 # run meta analyses
-                                ReplicationSum_analyzed <- MetaPipeX::meta_analyses(data = ReplicationSum_merged$Merged_Replication_Summaries)
+                                ReplicationSum_analyzed <- MetaPipeXUpdate::meta_analyses(data = ReplicationSum_merged$Merged_Replication_Summaries)
 
                                 ## combine Replication and meta analysis data
 
@@ -904,7 +904,7 @@ just type it in the Search field and all lines containing that word will be disp
                               style = "old",
                               {
                                 # run meta analyses
-                                ReplicationSum_analyzed <- MetaPipeX::meta_analyses(data = MergedReplicationSum)
+                                ReplicationSum_analyzed <- MetaPipeXUpdate::meta_analyses(data = MergedReplicationSum)
 
                                 ## combine replication and meta analysis data
 
