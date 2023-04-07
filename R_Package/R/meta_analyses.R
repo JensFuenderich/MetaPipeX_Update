@@ -1,10 +1,7 @@
 #' Meta Analyses
 #'
-#' @import metafor
 #' @import dplyr
 #' @import mathjaxr
-#' @import readr
-#' @importFrom stats na.omit
 #'
 #'
 #' @description

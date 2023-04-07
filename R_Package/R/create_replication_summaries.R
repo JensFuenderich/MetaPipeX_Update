@@ -1,10 +1,7 @@
 #' Creating Replication Summaries
 #'
 #' @import dplyr
-#' @import metafor
 #' @import mathjaxr
-#' @import readr
-#' @importFrom stats sd
 #'
 #'
 #' @description

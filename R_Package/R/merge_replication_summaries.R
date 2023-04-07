@@ -1,7 +1,6 @@
 #' Merging Replication Summaries
 #'
 #'
-#' @import readr
 #' @import dplyr
 #'
 #'

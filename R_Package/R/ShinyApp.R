@@ -1,21 +1,10 @@
 #' MetaPipeX Shiny App
 #'
-#' @import ggplot2
-#' @import grDevices
 #' @import magrittr
-#' @import metafor
-#' @import readr
 #' @import shiny
 #' @import shinythemes
 #' @import shinyWidgets
 #' @import utils
-#' @importFrom DT renderDT
-#' @importFrom DT DTOutput
-#' @importFrom haven read_sav
-#' @importFrom janitor compare_df_cols
-#' @importFrom puniform meta_plot
-#' @importFrom stats na.omit
-#' @importFrom stats cor
 #'
 #' @description
 #'
