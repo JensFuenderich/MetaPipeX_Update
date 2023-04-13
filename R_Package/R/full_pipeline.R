@@ -262,27 +262,27 @@ full_pipeline <- function(data, MultiLab = NULL, ReplicationProject = NULL, Repl
   # add correlations
   unique_ReplicationProject <- unique(merged_replication_summaries$ReplicationProject)
 
-  meta_analyses$cor_pooled_SD_MD <- as.vector(lapply(1:length(unique_ReplicationProject), function(x){
+  meta_analyses$cor_pooled_SD_MD <- unlist(lapply(1:length(unique_ReplicationProject), function(x){
     data <- subset(merged_replication_summaries, ReplicationProject == unique_ReplicationProject[x])
     cor(data$pooled_SD, data$MD)
   }))
 
-  meta_analyses$cor_pooled_SD_SMD <- as.vector(lapply(1:length(unique_ReplicationProject), function(x){
+  meta_analyses$cor_pooled_SD_SMD <- unlist(lapply(1:length(unique_ReplicationProject), function(x){
     data <- subset(merged_replication_summaries, ReplicationProject == unique_ReplicationProject[x])
     cor(data$pooled_SD, data$SMD)
   }))
 
-  meta_analyses$cor_C_M_MD <- as.vector(lapply(1:length(unique_ReplicationProject), function(x){
+  meta_analyses$cor_C_M_MD <- unlist(lapply(1:length(unique_ReplicationProject), function(x){
     data <- subset(merged_replication_summaries, ReplicationProject == unique_ReplicationProject[x])
     cor(data$C_M, data$MD)
   }))
 
-  meta_analyses$cor_T_M_MD <- as.vector(lapply(1:length(unique_ReplicationProject), function(x){
+  meta_analyses$cor_T_M_MD <- unlist(lapply(1:length(unique_ReplicationProject), function(x){
     data <- subset(merged_replication_summaries, ReplicationProject == unique_ReplicationProject[x])
     cor(data$T_M, data$MD)
   }))
 
-  meta_analyses$cor_C_SD_T_SD <- as.vector(lapply(1:length(unique_ReplicationProject), function(x){
+  meta_analyses$cor_C_SD_T_SD <- unlist(lapply(1:length(unique_ReplicationProject), function(x){
     data <- subset(merged_replication_summaries, ReplicationProject == unique_ReplicationProject[x])
     cor(data$C_SD, data$T_SD)
   }))

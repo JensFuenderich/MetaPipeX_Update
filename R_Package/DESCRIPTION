@@ -1,6 +1,6 @@
 Package: MetaPipeXUpdate
 Type: Package
-Title: Standardizing data structure, analysis code & reporting for experimental data of between groups comparisons in replication projects
+Title: Standardizing Data Structure, Analysis Code & Reporting for Experimental Data of Between Groups Comparisons in Replication Projects
 Version: 0.1.0
 Author: Jens Fuenderich
 Maintainer: Jens Fuenderich <Jens.Fuenderich@uni-erfurt.de>
@@ -14,8 +14,7 @@ Description: The MetaPipeX framework is a reaction to the diversity in reporting
     produced by the pipeline. While the framework maps most easily to direct
     replications, its scope may be broadened to conceptual replications and similar
     projects. Illustrations of the pipeline and the functions are available on
-    github in the Graphics folder: 
-    https://github.com/JensFuenderich/MetaPipeX/tree/main/Supplementary_Material
+    github in the Graphics folder: (<https://github.com/JensFuenderich/MetaPipeX/tree/main/Supplementary_Material>)
     The MetaPipeX R-package provides a readily available set of functions to run the
     standardized part of the pipeline. The package includes three analysis functions
     that each represent a step in the MetaPipeX pipeline

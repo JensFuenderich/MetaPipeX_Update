@@ -328,7 +328,7 @@ meta_analyses <- function(data, output_folder = NULL, suppress_list_output = FAL
       # https://stats.stackexchange.com/questions/241187/calculating-standard-deviation-after-log-transformation
       Replication.df["Est__C_SD"] <- as.vector(base::exp(Het_C_SD$b + 0.5 * Het_C_SD$sigma2))
       Replication.df["Est__C_SD_K"] <- Het_C_SD$k
-      Replication.df["Tau2__C_SD"] <- base::exp(Replication.df["Est__C_SD"]^2 * (base::exp(Het_C_SD$sigma2)-1))
+      Replication.df["Tau2__C_SD"] <- Replication.df["Est__C_SD"]^2 * (base::exp(Het_C_SD$sigma2)-1)
       Replication.df["Tau__C_SD"] <- sqrt(Replication.df["Tau2__C_SD"])
       Replication.df["CoeffVar__C_SD"] <- Replication.df["Tau__C_SD"]/abs(Replication.df["Est__C_SD"])
       Replication.df["I2__C_SD"] <- I2_fct(rma_mv_obj = Het_C_SD)
@@ -363,7 +363,7 @@ meta_analyses <- function(data, output_folder = NULL, suppress_list_output = FAL
       # https://stats.stackexchange.com/questions/241187/calculating-standard-deviation-after-log-transformation
       Replication.df["Est__T_SD"] <- as.vector(base::exp(Het_T_SD$b + 0.5 * Het_T_SD$sigma2))
       Replication.df["Est__T_SD_K"] <- Het_T_SD$k
-      Replication.df["Tau2__T_SD"] <- base::exp(Replication.df["Est__T_SD"]^2 * (base::exp(Het_T_SD$sigma2)-1))
+      Replication.df["Tau2__T_SD"] <- Replication.df["Est__T_SD"]^2 * (base::exp(Het_T_SD$sigma2)-1)
       Replication.df["Tau__T_SD"] <- sqrt(Replication.df["Tau2__T_SD"])
       Replication.df["CoeffVar__T_SD"] <- Replication.df["Tau__T_SD"]/abs(Replication.df["Est__T_SD"])
       Replication.df["I2__T_SD"] <- I2_fct(rma_mv_obj = Het_T_SD)
@@ -421,7 +421,7 @@ meta_analyses <- function(data, output_folder = NULL, suppress_list_output = FAL
       # https://stats.stackexchange.com/questions/241187/calculating-standard-deviation-after-log-transformation
       Replication.df["Est__pooled_SD"] <- as.vector(base::exp(Het_pooled_SD$b + 0.5 * Het_pooled_SD$sigma2))
       Replication.df["Est__pooled_SD_K"] <- Het_pooled_SD$k
-      Replication.df["Tau2__pooled_SD"] <- base::exp(Replication.df["Est__pooled_SD"]^2 * (base::exp(Het_pooled_SD$sigma2)-1))
+      Replication.df["Tau2__pooled_SD"] <- Replication.df["Est__pooled_SD"]^2 * (base::exp(Het_pooled_SD$sigma2)-1)
       Replication.df["Tau__pooled_SD"] <- sqrt(Replication.df["Tau2__pooled_SD"])
       Replication.df["CoeffVar__pooled_SD"] <- Replication.df["Tau__pooled_SD"]/abs(Replication.df["Est__pooled_SD"])
       Replication.df["I2__pooled_SD"] <- I2_fct(rma_mv_obj = Het_pooled_SD)

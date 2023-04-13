@@ -1556,7 +1556,7 @@ just type it in the Search field and all lines containing that word will be disp
       # create ggplot object
       kernel_density_est_plot <- shiny::reactive({
 
-        ggplot2::ggplot(data = kernel_density_est_data(), aes(Rep_Stat)) +
+        ggplot2::ggplot(data = kernel_density_est_data(), ggplot2::aes(Rep_Stat)) +
           ggplot2::geom_density() +
           ggplot2::geom_rug(sides="b",
                             length = unit(0.05, "npc"),
@@ -1667,9 +1667,9 @@ just type it in the Search field and all lines containing that word will be disp
 
       hist_plot <- shiny::reactive({
 
-        hist_plot_output <- ggplot2::ggplot(hist_data(), aes(x = Data, fill = Statistic, color = Statistic)) +
-          geom_histogram(position="identity",alpha = 0.7) +
-          theme_light()
+        hist_plot_output <- ggplot2::ggplot(hist_data(), ggplot2::aes(x = Data, fill = Statistic, color = Statistic)) +
+          ggplot2::geom_histogram(position="identity",alpha = 0.7) +
+          ggplot2::theme_light()
 
         hist_plot_output
 
@@ -1854,35 +1854,39 @@ just type it in the Search field and all lines containing that word will be disp
 
         violin_data <- as.data.frame(violin_plot_data())
 
-        p <- ggplot2::ggplot(violin_data, aes(x=Statistic, y=Data)) +
+        p <- ggplot2::ggplot(violin_data, ggplot2::aes(x=Statistic, y=Data)) +
           geom_violin(trim=TRUE) #+ scale_y_discrete(expand = c(3,5))
 
         if (input$violin_include_point_size == TRUE) {
 
-          violin_plot_output <- p + geom_boxplot(width = 0.1) +
-            geom_jitter(width = 0.3, aes(color = Statistic, size = dot_size), alpha = 0.7) +
+          violin_plot_output <-
+            p +
+            ggplot2::geom_boxplot(width = 0.1) +
+            ggplot2::geom_jitter(width = 0.3, ggplot2::aes(color = Statistic, size = dot_size), alpha = 0.7) +
             guides( color = "none") +
-            theme_light() +
-            theme(text = element_text(size=15)) +
-            theme(axis.title.x = element_blank()) +
-            scale_x_discrete(guide = guide_axis(n.dodge=3)) +
-            labs(title = unique(violin_data$common_level),
-                 subtitle = if (unique(violin_data$common_level) == "meta analysis level") {unique(violin_data$common_statistic)} else {}) +
-            scale_size_continuous( gsub("lab level: ", "", gsub("meta analysis level: ", "", base::subset(codebook, codebook$Variable_Name == input$violin_point_size)$Variable_Description)) )
+            ggplot2::theme_light() +
+            ggplot2::theme(text = element_text(size=15)) +
+            ggplot2::theme(axis.title.x = element_blank()) +
+            ggplot2::scale_x_discrete(guide = guide_axis(n.dodge=3)) +
+            ggplot2::labs(title = unique(violin_data$common_level),
+                          subtitle = if (unique(violin_data$common_level) == "meta analysis level") {unique(violin_data$common_statistic)} else {}) +
+            ggplot2::scale_size_continuous( gsub("lab level: ", "", gsub("meta analysis level: ", "", base::subset(codebook, codebook$Variable_Name == input$violin_point_size)$Variable_Description)) )
 
 
         } else {
 
-          violin_plot_output <- p + geom_boxplot(width = 0.1) +
-            geom_jitter(width = 0.3, aes(color = Statistic, size = dot_size), alpha = 0.7) +
-            guides( color = "none") +
-            theme_light() +
-            theme(text = element_text(size=15)) +
-            theme(axis.title.x = element_blank()) +
-            scale_x_discrete(guide = guide_axis(n.dodge=3)) +
-            labs(title = unique(violin_data$common_level),
-                 subtitle = if (unique(violin_data$common_level) == "meta analysis level") {unique(violin_data$common_statistic)} else {}) +
-            guides(size = "none")
+          violin_plot_output <-
+            p +
+            ggplot2::geom_boxplot(width = 0.1) +
+            ggplot2::geom_jitter(width = 0.3, ggplot2::aes(color = Statistic, size = dot_size), alpha = 0.7) +
+            ggplot2::guides( color = "none") +
+            ggplot2::theme_light() +
+            ggplot2::theme(text = element_text(size=15)) +
+            ggplot2::theme(axis.title.x = element_blank()) +
+            ggplot2::scale_x_discrete(guide = guide_axis(n.dodge=3)) +
+            ggplot2::labs(title = unique(violin_data$common_level),
+                          subtitle = if (unique(violin_data$common_level) == "meta analysis level") {unique(violin_data$common_statistic)} else {}) +
+            ggplot2::guides(size = "none")
         }
 
 
@@ -1989,7 +1993,7 @@ just type it in the Search field and all lines containing that word will be disp
 
         # Plotting
 
-        scatter_plot_output <- ggplot2::ggplot(plot_data, aes(x = X, y = Y)) +
+        scatter_plot_output <- ggplot2::ggplot(plot_data, ggplot2::aes(x = X, y = Y)) +
           geom_point(aes(colour = if (input$include_point_color == TRUE) {Point_Color}else{},
                          size = if (input$include_point_size == TRUE) {Point_Size}else{} )) +
           theme_light() +
