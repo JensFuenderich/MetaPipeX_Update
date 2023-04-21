@@ -265,7 +265,7 @@ example_data_list <- split(example_data_df,
 ## applying the input to the MetaPipeX function
 
 # run create_replication_summaries
-example_MetaPipeX_output <- MetaPipeX::create_replication_summaries(
+example_MetaPipeX_output <- MetaPipeXUpdate::create_replication_summaries(
 data = example_data_list,
 MultiLab = "MultiLab",
 ReplicationProject = "ReplicationProject",

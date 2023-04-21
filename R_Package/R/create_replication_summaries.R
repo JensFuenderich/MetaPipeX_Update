@@ -1,7 +1,8 @@
 #' Creating Replication Summaries
 #'
-#' @import dplyr
 #' @import mathjaxr
+#' @importFrom magrittr %>%
+#' @importFrom magrittr %<>%
 #'
 #'
 #' @description
@@ -266,7 +267,7 @@
 #' ## applying the input to the MetaPipeX function
 #'
 #' # run create_replication_summaries
-#' example_MetaPipeX_output <- MetaPipeX::create_replication_summaries(
+#' example_MetaPipeX_output <- MetaPipeXUpdate::create_replication_summaries(
 #' data = example_data_list,
 #' MultiLab = "MultiLab",
 #' ReplicationProject = "ReplicationProject",

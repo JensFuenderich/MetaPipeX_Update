@@ -97,7 +97,7 @@ example_data_list <- split(example_data_df,
 ## applying the input to the MetaPipeX function \cr
 
 # run full_pipeline
-example_MetaPipeX_output <- MetaPipeX::full_pipeline(
+example_MetaPipeX_output <- MetaPipeXUpdate::full_pipeline(
 data = example_data_list,
 MultiLab = "MultiLab", # column name needs no change
 ReplicationProject = "ReplicationProject",

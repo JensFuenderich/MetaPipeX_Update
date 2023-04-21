@@ -66,6 +66,8 @@ The function runs two meta-analyses per replication project:
 }
 \examples{
 
+\dontrun{
+
 # import the according table template
 Merged_Replication_Summaries_template <- readr::read_csv(url(
 paste("https://raw.githubusercontent.com/JensFuenderich/MetaPipeX/main/Supplementary_Material/",
@@ -118,9 +120,8 @@ merged_replication_summaries <- rbind(list_of_replication_summaries[[1]],
 ## applying the input to the MetaPipeX function
 
 # run merge_replication_summaries
-example_MetaPipeX_output <- MetaPipeX::meta_analyses(data = merged_replication_summaries)
+example_MetaPipeX_output <- MetaPipeXUpdate::meta_analyses(data = merged_replication_summaries)
 
-\dontrun{
 All examples with additional comments are available on github:
 https://github.com/JensFuenderich/MetaPipeX/tree/main/Supplementary_Material/Code_Examples
 }

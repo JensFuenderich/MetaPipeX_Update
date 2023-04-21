@@ -1,8 +1,9 @@
 #' Full Pipeline Function
 #'
 #'
-#' @import dplyr
 #' @import mathjaxr
+#' @importFrom magrittr %>%
+#' @importFrom magrittr %<>%
 #'
 #' @description
 #' \loadmathjax{}
@@ -73,7 +74,7 @@
 #' ## applying the input to the MetaPipeX function \cr
 #'
 #' # run full_pipeline
-#' example_MetaPipeX_output <- MetaPipeX::full_pipeline(
+#' example_MetaPipeX_output <- MetaPipeXUpdate::full_pipeline(
 #' data = example_data_list,
 #' MultiLab = "MultiLab", # column name needs no change
 #' ReplicationProject = "ReplicationProject",
@@ -264,27 +265,27 @@ full_pipeline <- function(data, MultiLab = NULL, ReplicationProject = NULL, Repl
 
   meta_analyses$cor_pooled_SD_MD <- unlist(lapply(1:length(unique_ReplicationProject), function(x){
     data <- subset(merged_replication_summaries, ReplicationProject == unique_ReplicationProject[x])
-    cor(data$pooled_SD, data$MD)
+    stats::cor(data$pooled_SD, data$MD)
   }))
 
   meta_analyses$cor_pooled_SD_SMD <- unlist(lapply(1:length(unique_ReplicationProject), function(x){
     data <- subset(merged_replication_summaries, ReplicationProject == unique_ReplicationProject[x])
-    cor(data$pooled_SD, data$SMD)
+    stats::cor(data$pooled_SD, data$SMD)
   }))
 
   meta_analyses$cor_C_M_MD <- unlist(lapply(1:length(unique_ReplicationProject), function(x){
     data <- subset(merged_replication_summaries, ReplicationProject == unique_ReplicationProject[x])
-    cor(data$C_M, data$MD)
+    stats::cor(data$C_M, data$MD)
   }))
 
   meta_analyses$cor_T_M_MD <- unlist(lapply(1:length(unique_ReplicationProject), function(x){
     data <- subset(merged_replication_summaries, ReplicationProject == unique_ReplicationProject[x])
-    cor(data$T_M, data$MD)
+    stats::cor(data$T_M, data$MD)
   }))
 
   meta_analyses$cor_C_SD_T_SD <- unlist(lapply(1:length(unique_ReplicationProject), function(x){
     data <- subset(merged_replication_summaries, ReplicationProject == unique_ReplicationProject[x])
-    cor(data$C_SD, data$T_SD)
+    stats::cor(data$C_SD, data$T_SD)
   }))
 
   # number of replications per replication project (= "How many labs are in each replication project?")
