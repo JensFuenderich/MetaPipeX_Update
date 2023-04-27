@@ -708,7 +708,7 @@ just type it in the Search field and all lines containing that word will be disp
 
                                     IPD_new <- list()
 
-                                    IPD_new <- lapply(1:length(unique_replicationprojects), function(x){IPD_new[[unique_replicationprojects[x]]] <- subset(IPD_list[[1]], IPD_list[[1]][input$replicationproject_col] == unique_replicationprojects[x])})
+                                    IPD_new <- lapply(unique_replicationprojects, function(x){IPD_new[[x]] <- subset(IPD_list[[1]], IPD_list[[1]][input$replicationproject_col] == x)})
 
                                     IPD_list <- IPD_new
 

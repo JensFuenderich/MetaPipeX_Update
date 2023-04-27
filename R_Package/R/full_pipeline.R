@@ -152,7 +152,7 @@ full_pipeline <- function(data, MultiLab = NULL, ReplicationProject = NULL, Repl
   ## renaming all list object columns according to function input
   # creating a function to rename the columns
   renamer <- function(x){
-    data[[x]] %>%
+    x %>%
       dplyr::rename(.,
                     MultiLab = {{ MultiLab }},
                     ReplicationProject = {{ ReplicationProject }},
@@ -160,13 +160,14 @@ full_pipeline <- function(data, MultiLab = NULL, ReplicationProject = NULL, Repl
                     DV = {{ DV }},
                     Group = {{ Group }})
   }
+
   # applying the function
-  data_list <- lapply(1:length(data), renamer)
+  data_List <- lapply(data, renamer)
 
   # renaming the list according to original data list
   # if no list names are available, use replication project names from list objects
   if (is.null(names(data)) == TRUE) {
-    names(data_list) <- unlist(lapply(1:length(data_list), function(x){unique(data_list[[x]]$ReplicationProject)}))
+    names(data_list) <- unlist(lapply(data_list, function(x){unique(x$ReplicationProject)}))
   } else {
     names(data_list) <- names(data)
   }
@@ -263,28 +264,28 @@ full_pipeline <- function(data, MultiLab = NULL, ReplicationProject = NULL, Repl
   # add correlations
   unique_ReplicationProject <- unique(merged_replication_summaries$ReplicationProject)
 
-  meta_analyses$cor_pooled_SD_MD <- unlist(lapply(1:length(unique_ReplicationProject), function(x){
-    data <- subset(merged_replication_summaries, ReplicationProject == unique_ReplicationProject[x])
+  meta_analyses$cor_pooled_SD_MD <- unlist(lapply(unique_ReplicationProject, function(x){
+    data <- subset(merged_replication_summaries, ReplicationProject == x)
     stats::cor(data$pooled_SD, data$MD)
   }))
 
-  meta_analyses$cor_pooled_SD_SMD <- unlist(lapply(1:length(unique_ReplicationProject), function(x){
-    data <- subset(merged_replication_summaries, ReplicationProject == unique_ReplicationProject[x])
+  meta_analyses$cor_pooled_SD_SMD <- unlist(lapply(unique_ReplicationProject, function(x){
+    data <- subset(merged_replication_summaries, ReplicationProject == x)
     stats::cor(data$pooled_SD, data$SMD)
   }))
 
-  meta_analyses$cor_C_M_MD <- unlist(lapply(1:length(unique_ReplicationProject), function(x){
-    data <- subset(merged_replication_summaries, ReplicationProject == unique_ReplicationProject[x])
+  meta_analyses$cor_C_M_MD <- unlist(lapply(unique_ReplicationProject, function(x){
+    data <- subset(merged_replication_summaries, ReplicationProject == x)
     stats::cor(data$C_M, data$MD)
   }))
 
-  meta_analyses$cor_T_M_MD <- unlist(lapply(1:length(unique_ReplicationProject), function(x){
-    data <- subset(merged_replication_summaries, ReplicationProject == unique_ReplicationProject[x])
+  meta_analyses$cor_T_M_MD <- unlist(lapply(unique_ReplicationProject, function(x){
+    data <- subset(merged_replication_summaries, ReplicationProject == x)
     stats::cor(data$T_M, data$MD)
   }))
 
-  meta_analyses$cor_C_SD_T_SD <- unlist(lapply(1:length(unique_ReplicationProject), function(x){
-    data <- subset(merged_replication_summaries, ReplicationProject == unique_ReplicationProject[x])
+  meta_analyses$cor_C_SD_T_SD <- unlist(lapply(unique_ReplicationProject, function(x){
+    data <- subset(merged_replication_summaries, ReplicationProject == x)
     stats::cor(data$C_SD, data$T_SD)
   }))
 
