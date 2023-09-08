@@ -120,7 +120,7 @@
 #' Merged_Site_Summaries <- MetaPipeXUpdate::merge_site_summaries(data = Site_Summaries$Site_Summaries)
 #'
 #' # run the MetaPipeX function to meta-analyze all MASCs
-#' MetaPipeXUpdate::merge_site_summaries(data = Merged_Site_Summaries$Merged_Site_Summaries)
+#' MetaPipeXUpdate::meta_analyze_MASCs(data = Merged_Site_Summaries$Merged_Site_Summaries)
 #'
 #' \dontrun{
 #' All examples with additional comments are available on github:
@@ -354,7 +354,7 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
       # insert the meta analysical results at the appropriate columns in the df
       # transformations for Est_, Tau_ and /Tau2_ according to:
       # https://stats.stackexchange.com/questions/241187/calculating-standard-deviation-after-log-transformation
-      MASC.df["Est__C_SD"] <- Model_Est_fun(Het_C_SD$b, Het_C_SD$sigma2)
+      MASC.df["Est__C_SD"] <- Model_Est_fun(as.numeric(Het_C_SD$b), Het_C_SD$sigma2)
       MASC.df["Est__C_SD_K"] <- Het_C_SD$k
       MASC.df["Tau2__C_SD"] <- Tau2_fun(MASC.df["Est__C_SD"], Het_C_SD$sigma2)
       MASC.df["Tau__C_SD"] <- sqrt(MASC.df["Tau2__C_SD"])
@@ -395,7 +395,7 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
       # insert the meta analysical results at the appropriate columns in the df
       # transformations for Est_, Tau_ and /Tau2_ according to:
       # https://stats.stackexchange.com/questions/241187/calculating-standard-deviation-after-log-transformation
-      MASC.df["Est__T_SD"] <- Model_Est_fun(Het_T_SD$b, Het_T_SD$sigma2)
+      MASC.df["Est__T_SD"] <- Model_Est_fun(as.numeric(Het_T_SD$b), Het_T_SD$sigma2)
       MASC.df["Est__T_SD_K"] <- Het_T_SD$k
       MASC.df["Tau2__T_SD"] <- Tau2_fun(MASC.df["Est__T_SD"], Het_T_SD$sigma2)
       MASC.df["Tau__T_SD"] <- sqrt(MASC.df["Tau2__T_SD"])
@@ -459,7 +459,7 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
       # insert the meta analysical results at the appropriate columns in the df
       # transformations for Est_, Tau_ and /Tau2_ according to:
       # https://stats.stackexchange.com/questions/241187/calculating-standard-deviation-after-log-transformation
-      MASC.df["Est__pooled_SD"] <- Model_Est_fun(Het_pooled_SD$b, Het_pooled_SD$sigma2)
+      MASC.df["Est__pooled_SD"] <- Model_Est_fun(as.numeric(Het_pooled_SD$b), Het_pooled_SD$sigma2)
       MASC.df["Est__pooled_SD_K"] <- Het_pooled_SD$k
       MASC.df["Tau2__pooled_SD"] <- Tau2_fun(MASC.df["Est__pooled_SD"], Het_pooled_SD$sigma2)
       MASC.df["Tau__pooled_SD"] <- sqrt(MASC.df["Tau2__pooled_SD"])
@@ -519,6 +519,8 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
 
   # create output df from list object
   meta_analyses <- dplyr::bind_rows(lapply(nested_list_output, function(x){dplyr::bind_rows(x)}))
+
+  meta_analyses <<- meta_analyses
 
   ### Create codebook
 
