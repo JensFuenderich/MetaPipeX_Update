@@ -20,11 +20,56 @@
 #' @details
 #'
 #' The meta-analyses within the function are written with metafor::rma.mv (Viechtbauer, 2010). The multivariate version of the rma function is deployed to allow for the use of sparse matrices (“sparse = TRUE”) for optimal performance in meta-analyses with thousands of data collection sites. They are fitted as a random-effects model with “random = ~ 1 | Data_Collection_Site” and a restricted maximum likelihood estimation (“REML”).
-#' The function runs two meta-analyses per MASC:
+#' The function runs seven meta-analyses per MASC:
 #' \itemize{
-#'  \item{mean difference (yi = MD, sei = SE_MD)}
-#'  \item{standardized mean difference (yi = SMD, sei = SE_SMD)}
+#'  \item{control mean (yi = C_M, V = SE_C_M)}
+#'  \item{treatment mean (yi = T_M, V = SE_T_M)}
+#'  \item{control group standard deviation(yi = ln_SD, V = SE_ln_SD)}
+#'  \item{treatment group standard deviation (yi = ln_SD, V = SE_ln_SD)}
+#'  \item{mean difference (yi = MD, V = SE_MD)}
+#'  \item{pooled standard deviation (yi = ln_SD, V = SE_ln_SD)}
+#'  \item{standardized mean difference (yi = SMD, V = SE_SMD)}
 #'  }
+#'
+#'  Meta-analyses of standard deviations are performed on log-transformed standard deviations, as recommended by Nakagawa et al. (2015). All standard deviations (C_SD, T_SD, pooled_SD) are transformed using:
+#'  \itemize{
+#'  \item{R-Code} \cr
+#'    \code{ln_SD = log(SD) + 1 / (2 * (n - 1)) } \cr
+#'  \item{Model} \cr
+#'    {
+#'      \mjdeqn{ ln \hat{\tau} =  ln SD + \frac{1}{2(n-1)} }{}
+#'    }
+#'  }
+#'  All standard errors of standard deviations are created using:
+#' \itemize{
+#'  \item{R-Code} \cr
+#'    \code{SE_ln_SD = sqrt(1 / (2 * (n - 1))) } \cr
+#'  \item{Model} \cr
+#'    {
+#'      \mjdeqn{  s_{ln \hat{\tau}}^2 = \sqrt{ \frac{1}{2(n-1)} } }{}
+#'    }
+#'  }
+#'
+#'  In order to achieve interpretable meta-analytical results (the model estimate, tau, tau^2 and the coefficient of variation), they are transformed back into the original units. The following transformation is applied to the model estimate:
+#'  \itemize{
+#'  \item{R-Code} \cr
+#'    \code{Model_Est = exp(mu_ln + 0.5 * tau2_ln)} \cr
+#'  \item{Model} \cr
+#'    {
+#'      \mjdeqn{  \mu = e^{\mu_{ln}+0.5\tau_{ln}^2} }{}
+#'    }
+#'  }
+#'  The following transformation is applied to tau^2 (which is subsequently used to calculate tau and the coefficient of variation):
+#'  \itemize{
+#'  \item{R-Code} \cr
+#'    \code{Tau2 =  exp(2 * mu_ln + tau2_ln) * (exp(tau2_ln) - 1) } \cr
+#'  \item{Model} \cr
+#'    {
+#'      \mjdeqn{  \tau^2 = e^{2 \mu_{ln} + \tau_{ln}^2} ( e^{\tau_{ln}^2} - 1 ) }{}
+#'    }
+#'  }
+#'
+#'
 #'
 #' @return
 #' The output is a list with two objects: A data frame with the meta-analytical results and a codebook for unambiguous identification of its columns. \cr
@@ -56,6 +101,7 @@
 #' @references
 #'
 #' Viechtbauer, W. (2010). Conducting meta-analyses in R with the metafor package. Journal of Statistical Software, 36(3), 1-48. doi: 10.18637/jss.v036.i03
+#' Nakagawa, S., Poulin, R., Mengersen, K., Reinhold, K., Engqvist, L., Lagisz, M., & Senior, A. M. (2015). Meta‐analysis of variation: ecological and evolutionary applications and beyond. Methods in Ecology and Evolution, 6(2), 143-152. doi: 10.1111/2041-210X.12309
 #'
 #' @examples
 #'
@@ -220,6 +266,18 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
       sqrt(1 / (2 * (n - 1)))
     }
 
+    ## transformation back from log to original unit for meta-analyses of standard deviations
+    # transformations according to https://mathworld.wolfram.com/LogNormalDistribution.html
+
+    # define transformation to original unit for the model estimate
+    Model_Est_fun <- function(mu_ln, tau2_ln){
+      exp(mu_ln + 0.5 * tau2_ln)
+    }
+    # define transformation to original unit for tau2
+    Tau2_fun <- function(mu_ln, tau2_ln){
+      exp(2 * mu_ln + tau2_ln)* (exp(tau2_ln) - 1)
+    }
+
     ## run meta-analyses and fill "MASC.df" with the output
 
     # 1 Heterogeneity of control mean
@@ -273,13 +331,19 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
       # use the subset of columns relevant to this analysis
       column_subset <- stats::na.omit(subset_MASC[, c("Data_Collection_Site", "C_N", "C_SD")])
       # create df with ln data
-      ln_data <- data.frame(
+      ln_data_full <- data.frame(
         Data_Collection_Site = column_subset$Data_Collection_Site,
         ln_SD = ln_SD_fun(SD = column_subset$C_SD,
                           n = column_subset$C_N),
         SE_ln_SD = SE_lnSD_fun(n = column_subset$C_N)
 
       )
+      # remove values that irritate the meta-analysis
+      ln_data <- ln_data_full %>% dplyr::filter(is.finite(ln_SD))
+      # print warning, if necessary
+      if (nrow(ln_data_full) > nrow(ln_data)) {
+        print("data collection sites were removed, due to non-positive ln(C_SD)")
+      }
       # run the meta-analysis
       Het_C_SD <- metafor::rma.mv(yi = ln_SD,
                                   V = SE_ln_SD^2,
@@ -290,9 +354,9 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
       # insert the meta analysical results at the appropriate columns in the df
       # transformations for Est_, Tau_ and /Tau2_ according to:
       # https://stats.stackexchange.com/questions/241187/calculating-standard-deviation-after-log-transformation
-      MASC.df["Est__C_SD"] <- as.vector(base::exp(Het_C_SD$b + 0.5 * Het_C_SD$sigma2))
+      MASC.df["Est__C_SD"] <- Model_Est_fun(Het_C_SD$b, Het_C_SD$sigma2)
       MASC.df["Est__C_SD_K"] <- Het_C_SD$k
-      MASC.df["Tau2__C_SD"] <- MASC.df["Est__C_SD"]^2 * (base::exp(Het_C_SD$sigma2)-1)
+      MASC.df["Tau2__C_SD"] <- Tau2_fun(MASC.df["Est__C_SD"], Het_C_SD$sigma2)
       MASC.df["Tau__C_SD"] <- sqrt(MASC.df["Tau2__C_SD"])
       MASC.df["CoeffVar__C_SD"] <- MASC.df["Tau__C_SD"]/abs(MASC.df["Est__C_SD"])
       MASC.df["I2__C_SD"] <- I2_fct(rma_mv_obj = Het_C_SD)
@@ -308,13 +372,19 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
       # use the subset of columns relevant to this analysis
       column_subset <- stats::na.omit(subset_MASC[, c("Data_Collection_Site", "T_N", "T_SD")])
       # create df with ln data
-      ln_data <- data.frame(
+      ln_data_full <- data.frame(
         Data_Collection_Site = column_subset$Data_Collection_Site,
         ln_SD = ln_SD_fun(SD = column_subset$T_SD,
                           n = column_subset$T_N),
         SE_ln_SD = SE_lnSD_fun(n = column_subset$T_N)
 
       )
+      # remove values that irritate the meta-analysis
+      ln_data <- ln_data_full %>% dplyr::filter(is.finite(ln_SD))
+      # print warning, if necessary
+      if (nrow(ln_data_full) > nrow(ln_data)) {
+        print("data collection sites were removed, due to non-positive ln(T_SD)")
+      }
       # run the meta-analysis
       Het_T_SD <- metafor::rma.mv(yi = ln_SD,
                                   V = SE_ln_SD^2,
@@ -325,9 +395,9 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
       # insert the meta analysical results at the appropriate columns in the df
       # transformations for Est_, Tau_ and /Tau2_ according to:
       # https://stats.stackexchange.com/questions/241187/calculating-standard-deviation-after-log-transformation
-      MASC.df["Est__T_SD"] <- as.vector(base::exp(Het_T_SD$b + 0.5 * Het_T_SD$sigma2))
+      MASC.df["Est__T_SD"] <- Model_Est_fun(Het_T_SD$b, Het_T_SD$sigma2)
       MASC.df["Est__T_SD_K"] <- Het_T_SD$k
-      MASC.df["Tau2__T_SD"] <- MASC.df["Est__T_SD"]^2 * (base::exp(Het_T_SD$sigma2)-1)
+      MASC.df["Tau2__T_SD"] <- Tau2_fun(MASC.df["Est__T_SD"], Het_T_SD$sigma2)
       MASC.df["Tau__T_SD"] <- sqrt(MASC.df["Tau2__T_SD"])
       MASC.df["CoeffVar__T_SD"] <- MASC.df["Tau__T_SD"]/abs(MASC.df["Est__T_SD"])
       MASC.df["I2__T_SD"] <- I2_fct(rma_mv_obj = Het_T_SD)
@@ -366,13 +436,19 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
       # use the subset of columns relevant to this analysis
       column_subset <- stats::na.omit(subset_MASC[, c("Data_Collection_Site", "T_N", "C_N", "pooled_SD")])
       # create df with ln data
-      ln_data <- data.frame(
+      ln_data_full <- data.frame(
         Data_Collection_Site = column_subset$Data_Collection_Site,
         ln_SD = ln_SD_fun(SD = column_subset$pooled_SD,
                           n = column_subset$T_N + column_subset$C_N),
         SE_ln_SD = SE_lnSD_fun(n =  column_subset$T_N + column_subset$C_N)
 
       )
+      # remove values that irritate the meta-analysis
+      ln_data <- ln_data_full %>% dplyr::filter(is.finite(ln_SD))
+      # print warning, if necessary
+      if (nrow(ln_data_full) > nrow(ln_data)) {
+        print("data collection sites were removed, due to non-positive ln(pooled_SD)")
+      }
       # run the meta-analysis
       Het_pooled_SD <- metafor::rma.mv(yi = ln_SD,
                                        V = SE_ln_SD^2,
@@ -383,9 +459,9 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
       # insert the meta analysical results at the appropriate columns in the df
       # transformations for Est_, Tau_ and /Tau2_ according to:
       # https://stats.stackexchange.com/questions/241187/calculating-standard-deviation-after-log-transformation
-      MASC.df["Est__pooled_SD"] <- as.vector(base::exp(Het_pooled_SD$b + 0.5 * Het_pooled_SD$sigma2))
+      MASC.df["Est__pooled_SD"] <- Model_Est_fun(Het_pooled_SD$b, Het_pooled_SD$sigma2)
       MASC.df["Est__pooled_SD_K"] <- Het_pooled_SD$k
-      MASC.df["Tau2__pooled_SD"] <- MASC.df["Est__pooled_SD"]^2 * (base::exp(Het_pooled_SD$sigma2)-1)
+      MASC.df["Tau2__pooled_SD"] <- Tau2_fun(MASC.df["Est__pooled_SD"], Het_pooled_SD$sigma2)
       MASC.df["Tau__pooled_SD"] <- sqrt(MASC.df["Tau2__pooled_SD"])
       MASC.df["CoeffVar__pooled_SD"] <- MASC.df["Tau__pooled_SD"]/abs(MASC.df["Est__pooled_SD"])
       MASC.df["I2__pooled_SD"] <- I2_fct(rma_mv_obj = Het_pooled_SD)

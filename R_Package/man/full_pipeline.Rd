@@ -42,7 +42,7 @@ full_pipeline(
 \item{sparse}{A logical indicating whether sparse matrices should be used.}
 }
 \value{
-The output is a nested list object that represents the folder structure that is available under LINK EINFUEGEN
+The output is a nested list object that represents the folder structure that is available on \href{https://github.com/JensFuenderich/MetaPipeX_Update/tree/main/Supplementary_Material/Table_Templates}{{GitHub}}. For an inspection of the list output, run the example.
 }
 \description{
 \loadmathjax{}
@@ -65,9 +65,9 @@ This function executes the pipeline as follows:
 
 \itemize{
  \item{MetaPipeXUpdate::summarize_sites()} \cr
- \item{MetaPipeXUpdate::merge_site_summaries} \cr
- \item{MetaPipeXUpdate::meta_analyses()} \cr
- \item{merging site- and meta-level data to achieve MetaPipeX data format} \cr
+ \item{MetaPipeXUpdate::merge_site_summaries()} \cr
+ \item{MetaPipeXUpdate::meta_analyze_MASCs()} \cr
+ \item{MetaPipeXUpdate::create_MetaPipeX_format()} \cr
 }
 }
 \examples{

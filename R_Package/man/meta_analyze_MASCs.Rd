@@ -58,10 +58,53 @@ Function to run meta-analyses on the mean difference (MD) and the standardized m
 }
 \details{
 The meta-analyses within the function are written with metafor::rma.mv (Viechtbauer, 2010). The multivariate version of the rma function is deployed to allow for the use of sparse matrices (“sparse = TRUE”) for optimal performance in meta-analyses with thousands of data collection sites. They are fitted as a random-effects model with “random = ~ 1 | Data_Collection_Site” and a restricted maximum likelihood estimation (“REML”).
-The function runs two meta-analyses per MASC:
+The function runs seven meta-analyses per MASC:
 \itemize{
- \item{mean difference (yi = MD, sei = SE_MD)}
- \item{standardized mean difference (yi = SMD, sei = SE_SMD)}
+ \item{control mean (yi = C_M, V = SE_C_M)}
+ \item{treatment mean (yi = T_M, V = SE_T_M)}
+ \item{control group standard deviation(yi = ln_SD, V = SE_ln_SD)}
+ \item{treatment group standard deviation (yi = ln_SD, V = SE_ln_SD)}
+ \item{mean difference (yi = MD, V = SE_MD)}
+ \item{pooled standard deviation (yi = ln_SD, V = SE_ln_SD)}
+ \item{standardized mean difference (yi = SMD, V = SE_SMD)}
+ }
+
+ Meta-analyses of standard deviations are performed on log-transformed standard deviations, as recommended by Nakagawa et al. (2015). All standard deviations (C_SD, T_SD, pooled_SD) are transformed using:
+ \itemize{
+ \item{R-Code} \cr
+   \code{ln_SD = log(SD) + 1 / (2 * (n - 1)) } \cr
+ \item{Model} \cr
+   {
+     \mjdeqn{ ln \hat{\tau} =  ln SD + \frac{1}{2(n-1)} }{}
+   }
+ }
+ All standard errors of standard deviations are created using:
+\itemize{
+ \item{R-Code} \cr
+   \code{SE_ln_SD = sqrt(1 / (2 * (n - 1))) } \cr
+ \item{Model} \cr
+   {
+     \mjdeqn{  s_{ln \hat{\tau}}^2 = \sqrt{ \frac{1}{2(n-1)} } }{}
+   }
+ }
+
+ In order to achieve interpretable meta-analytical results (the model estimate, tau, tau^2 and the coefficient of variation), they are transformed back into the original units. The following transformation is applied to the model estimate:
+ \itemize{
+ \item{R-Code} \cr
+   \code{Model_Est = exp(mu_ln + 0.5 * tau2_ln)} \cr
+ \item{Model} \cr
+   {
+     \mjdeqn{  \mu = e^{\mu_{ln}+0.5\tau_{ln}^2} }{}
+   }
+ }
+ The following transformation is applied to tau^2 (which is subsequently used to calculate tau and the coefficient of variation):
+ \itemize{
+ \item{R-Code} \cr
+   \code{Tau2 =  exp(2 * mu_ln + tau2_ln) * (exp(tau2_ln) - 1) } \cr
+ \item{Model} \cr
+   {
+     \mjdeqn{  \tau^2 = e^{2 \mu_{ln} + \tau_{ln}^2} ( e^{\tau_{ln}^2} - 1 ) }{}
+   }
  }
 }
 \examples{
@@ -91,4 +134,5 @@ https://github.com/JensFuenderich/MetaPipeX/tree/main/Supplementary_Material/Cod
 }
 \references{
 Viechtbauer, W. (2010). Conducting meta-analyses in R with the metafor package. Journal of Statistical Software, 36(3), 1-48. doi: 10.18637/jss.v036.i03
+Nakagawa, S., Poulin, R., Mengersen, K., Reinhold, K., Engqvist, L., Lagisz, M., & Senior, A. M. (2015). Meta‐analysis of variation: ecological and evolutionary applications and beyond. Methods in Ecology and Evolution, 6(2), 143-152. doi: 10.1111/2041-210X.12309
 }

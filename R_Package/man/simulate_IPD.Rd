@@ -21,7 +21,7 @@ simulate_IPD
 }
 \examples{
 # create IPD for 5 MASCs (all from the same MultiLab)
-sim_out <- lapply(1:5, eval(MetaPipeX::simulate_IPD))
+sim_out <- lapply(1:5, eval(MetaPipeXUpdate::simulate_IPD))
 # rename list elements (the individual MASCs)
 names(sim_out) <- paste("MASC", 1:5, sep = "")
 
