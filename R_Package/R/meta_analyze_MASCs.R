@@ -530,7 +530,7 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
 
   # pair abbreviations with verbal descriptions
   abbr_library <- as.data.frame(base::rbind(c("_N", "_number of participants"),
-                                            c("_K", "_number of replications"),
+                                            c("_K", "_number of data collection sites"),
                                             c("_C_", "__control group_"),
                                             c("_T_", "__treatment group_"),
                                             c("__pooled_", "__pooled_"),

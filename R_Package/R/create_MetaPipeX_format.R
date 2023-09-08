@@ -137,7 +137,7 @@ create_MetaPipeX_format <- function(Merged_Site_Summaries, Meta_Analyses, output
                                             c("_SMD", "_standardized mean difference"),
                                             c("MA__", "meta analysis level:__"),
                                             c("__pooled_", "__pooled_"),
-                                            c("Replication__", "replication level:__"), # redundant but maybe necessary for code (if pooled works but (for example) "Estimate" does not, I'll know)
+                                            c("Site__", "site level:__"), # redundant but maybe necessary for code (if pooled works but (for example) "Estimate" does not, I'll know)
                                             c("__Tau2_", "__Tau2 for_"),
                                             c("__Tau_", "__Tau for_"),
                                             c("__CoeffVar_", "__Coefficient of Variation (tau/model_est) for_"),
