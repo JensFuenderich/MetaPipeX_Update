@@ -124,7 +124,7 @@ Site_Summaries <- MetaPipeXUpdate::summarize_sites(data = sim_out)
 Merged_Site_Summaries <- MetaPipeXUpdate::merge_site_summaries(data = Site_Summaries$Site_Summaries)
 
 # run the MetaPipeX function to meta-analyze all MASCs
-MetaPipeXUpdate::merge_site_summaries(data = Merged_Site_Summaries$Merged_Site_Summaries)
+MetaPipeXUpdate::meta_analyze_MASCs(data = Merged_Site_Summaries$Merged_Site_Summaries)
 
 \dontrun{
 All examples with additional comments are available on github:

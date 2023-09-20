@@ -644,20 +644,6 @@ server <- function(input, output, session){
   # after applying MetaPipeX functions (depending on the data type imported),
   # the df that is then provided to "Data Selection" is stored as MetaPipeX_data$full
 
-  ## This chunk creates the "confirm upload" button, only when data is supplied to the app
-  # the dependency is created so that the app does not crash due to analyses being run without any input
-  output$confirm_upload2 <- renderUI({
-
-    if( is.null(SiteSum_list_reactive()) &
-        is.null(input$IPD_Input) &
-        is.null(input$SiteSum_Input) &
-        is.null(input$MergedSiteSum_Input) &
-        is.null(input$MetaPipeX_Input)
-    ){ } else {
-      actionButton("confirm_upload","Run pipeline & Provide data to app")
-    }
-  })
-
   ## Simulated Data Input
   # When the user presses "Run Simulation", the MetaPipeX function creates an IPD file
   SiteSum_list_reactive <- eventReactive( input$run_simulation, {
@@ -673,6 +659,22 @@ server <- function(input, output, session){
     } else {
       c()
     }
+  })
+
+  ## This chunk creates the "confirm upload" button, only when data is supplied to the app
+  # the dependency is created so that the app does not crash due to analyses being run without any input
+  output$confirm_upload2 <- renderUI({
+
+    if(
+      input$run_simulation == 0 &
+      is.null(input$IPD_Input) &
+      is.null(input$SiteSum_Input) &
+      is.null(input$MergedSiteSum_Input) &
+      is.null(input$MetaPipeX_Input)
+    ){ } else {
+      actionButton("confirm_upload","Run pipeline & Provide data to app")
+    }
+
   })
 
   ## create output
