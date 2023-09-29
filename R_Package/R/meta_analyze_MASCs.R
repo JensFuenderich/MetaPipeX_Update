@@ -356,7 +356,7 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
       # https://stats.stackexchange.com/questions/241187/calculating-standard-deviation-after-log-transformation
       MASC.df["Est__C_SD"] <- Model_Est_fun(as.numeric(Het_C_SD$b), Het_C_SD$sigma2)
       MASC.df["Est__C_SD_K"] <- Het_C_SD$k
-      MASC.df["Tau2__C_SD"] <- Tau2_fun(MASC.df["Est__C_SD"], Het_C_SD$sigma2)
+      MASC.df["Tau2__C_SD"] <- Tau2_fun(as.numeric(Het_C_SD$b), Het_C_SD$sigma2)
       MASC.df["Tau__C_SD"] <- sqrt(MASC.df["Tau2__C_SD"])
       MASC.df["CoeffVar__C_SD"] <- MASC.df["Tau__C_SD"]/abs(MASC.df["Est__C_SD"])
       MASC.df["I2__C_SD"] <- I2_fct(rma_mv_obj = Het_C_SD)
@@ -397,7 +397,7 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
       # https://stats.stackexchange.com/questions/241187/calculating-standard-deviation-after-log-transformation
       MASC.df["Est__T_SD"] <- Model_Est_fun(as.numeric(Het_T_SD$b), Het_T_SD$sigma2)
       MASC.df["Est__T_SD_K"] <- Het_T_SD$k
-      MASC.df["Tau2__T_SD"] <- Tau2_fun(MASC.df["Est__T_SD"], Het_T_SD$sigma2)
+      MASC.df["Tau2__T_SD"] <- Tau2_fun(as.numeric(Het_T_SD$b), Het_T_SD$sigma2)
       MASC.df["Tau__T_SD"] <- sqrt(MASC.df["Tau2__T_SD"])
       MASC.df["CoeffVar__T_SD"] <- MASC.df["Tau__T_SD"]/abs(MASC.df["Est__T_SD"])
       MASC.df["I2__T_SD"] <- I2_fct(rma_mv_obj = Het_T_SD)
@@ -461,7 +461,7 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
       # https://stats.stackexchange.com/questions/241187/calculating-standard-deviation-after-log-transformation
       MASC.df["Est__pooled_SD"] <- Model_Est_fun(as.numeric(Het_pooled_SD$b), Het_pooled_SD$sigma2)
       MASC.df["Est__pooled_SD_K"] <- Het_pooled_SD$k
-      MASC.df["Tau2__pooled_SD"] <- Tau2_fun(MASC.df["Est__pooled_SD"], Het_pooled_SD$sigma2)
+      MASC.df["Tau2__pooled_SD"] <- Tau2_fun(as.numeric(Het_pooled_SD$b), Het_pooled_SD$sigma2)
       MASC.df["Tau__pooled_SD"] <- sqrt(MASC.df["Tau2__pooled_SD"])
       MASC.df["CoeffVar__pooled_SD"] <- MASC.df["Tau__pooled_SD"]/abs(MASC.df["Est__pooled_SD"])
       MASC.df["I2__pooled_SD"] <- I2_fct(rma_mv_obj = Het_pooled_SD)
