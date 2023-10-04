@@ -43,5 +43,6 @@ Imports:
     shinythemes,
     shinyWidgets,
     stats,
-    utils
+    utils,
+    zip
 RdMacros: mathjaxr

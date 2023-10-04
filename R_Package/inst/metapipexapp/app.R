@@ -1752,7 +1752,7 @@ server <- function(input, output, session){
       }
 
       # output
-      utils::zip(file,
+      zip::zip(file,
                  file.path("MetaPipeX_folder"))
       unlink(file.path("MetaPipeX_folder"), recursive = TRUE)
 
