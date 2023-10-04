@@ -15,6 +15,6 @@ ShinyApp <- function(){
 
   appDir <- system.file("metapipexapp", package = "MetaPipeXUpdate")
   runApp(appDir = appDir,
-         launch.browser = TRUE)
+         launch.browser = FALSE)
 
 }
