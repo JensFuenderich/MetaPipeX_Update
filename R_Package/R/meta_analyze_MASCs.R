@@ -154,6 +154,14 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
       "Est__pooled_SD",
       "Est__MD",
       "Est__SMD",
+      # pval of Meta-analytic Estimates:
+      "pval_Est__C_M",
+      "pval_Est__T_M",
+      "pval_Est__C_SD",
+      "pval_Est__T_SD",
+      "pval_Est__pooled_SD",
+      "pval_Est__MD",
+      "pval_Est__SMD",
       # K of Meta-analytic Estimates:
       "Est__C_M_K",
       "Est__T_M_K",
@@ -281,219 +289,75 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
     ## run meta-analyses and fill "MASC.df" with the output
 
     # 1 Heterogeneity of control mean
-    if ( nrow(stats::na.omit(subset_MASC[, c("Data_Collection_Site", "C_M", "SE_C_M")])) <= 1 ) {} else {
-      # run the meta-analysis
-      Het_C_M <- metafor::rma.mv(yi = C_M,
-                                 V = SE_C_M^2,
-                                 random = ~ 1 | Data_Collection_Site,
-                                 method = method,
-                                 sparse = sparse,
-                                 data = stats::na.omit(subset_MASC[, c("Data_Collection_Site", "C_M", "SE_C_M")]))
-      # insert the meta analysical results at the appropriate columns in the df
-      MASC.df["Est__C_M"] <- as.vector(Het_C_M$b)
-      MASC.df["Est__C_M_K"] <- Het_C_M$k
-      MASC.df["Tau2__C_M"] <- Het_C_M$sigma2
-      MASC.df["Tau__C_M"] <- sqrt(Het_C_M$sigma2)
-      MASC.df["CoeffVar__C_M"] <- sqrt(Het_C_M$sigma2)/abs(as.vector(Het_C_M$b))
-      MASC.df["I2__C_M"] <- I2_fct(rma_mv_obj = Het_C_M)
-      MASC.df["H2__C_M"] <- H2_fct(rma_mv_obj = Het_C_M)
-      MASC.df["QE__C_M"] <- Het_C_M$QE
-      MASC.df["QEp__C_M"] <- Het_C_M$QEp
-
-      rm(Het_C_M)
-    }
+    MASC.df <- MetaPipeXUpdate:::standard_MA_subset(MASC_data = subset_MASC,
+                                                    Data_Collection_Site = "Data_Collection_Site",
+                                                    yi = "C_M",
+                                                    SE = "SE_C_M",
+                                                    method = method,
+                                                    sparse = sparse,
+                                                    MASC.df = MASC.df)
 
     # 2 Heterogeneity of treatment mean
-    if ( nrow(stats::na.omit(subset_MASC[, c("Data_Collection_Site", "T_M", "SE_T_M")])) <= 1 ) {} else {
-      # run the meta-analysis
-      Het_T_M <- metafor::rma.mv(yi = T_M,
-                                 V = SE_T_M^2,
-                                 random = ~ 1 | Data_Collection_Site,
-                                 method = method,
-                                 sparse = sparse,
-                                 data = stats::na.omit(subset_MASC[, c("Data_Collection_Site", "T_M", "SE_T_M")]))
-      # insert the meta analysical results at the appropriate columns in the df
-      MASC.df["Est__T_M"] <- as.vector(Het_T_M$b)
-      MASC.df["Est__T_M_K"] <- Het_T_M$k
-      MASC.df["Tau2__T_M"] <- Het_T_M$sigma2
-      MASC.df["Tau__T_M"] <- sqrt(Het_T_M$sigma2)
-      MASC.df["CoeffVar__T_M"] <- sqrt(Het_T_M$sigma2)/abs(as.vector(Het_T_M$b))
-      MASC.df["I2__T_M"] <- I2_fct(rma_mv_obj = Het_T_M)
-      MASC.df["H2__T_M"] <- H2_fct(rma_mv_obj = Het_T_M)
-      MASC.df["QE__T_M"] <- Het_T_M$QE
-      MASC.df["QEp__T_M"] <- Het_T_M$QEp
-
-      rm(Het_T_M)
-    }
+    MASC.df <- MetaPipeXUpdate:::standard_MA_subset(MASC_data = subset_MASC,
+                                                    Data_Collection_Site = "Data_Collection_Site",
+                                                    yi = "T_M",
+                                                    SE = "SE_T_M",
+                                                    method = method,
+                                                    sparse = sparse,
+                                                    MASC.df = MASC.df)
 
     # 3 Heterogeneity of control group SD
-    if ( nrow(stats::na.omit(subset_MASC[, c("Data_Collection_Site", "C_N", "C_SD")])) <= 1) {} else {
-      # use the subset of columns relevant to this analysis
-      column_subset <- stats::na.omit(subset_MASC[, c("Data_Collection_Site", "C_N", "C_SD")])
-      # create df with ln data
-      ln_data_full <- data.frame(
-        Data_Collection_Site = column_subset$Data_Collection_Site,
-        ln_SD = ln_SD_fun(SD = column_subset$C_SD,
-                          n = column_subset$C_N),
-        SE_ln_SD = SE_lnSD_fun(n = column_subset$C_N)
+    MASC.df <- MetaPipeXUpdate:::ln_MA_subset(MASC_data = subset_MASC,
+                                              Data_Collection_Site = "Data_Collection_Site",
+                                              yi = "C_SD",
+                                              SE = "SE_C_SD",
+                                              N = "C_N",
+                                              method = method,
+                                              sparse = sparse,
+                                              MASC.df = MASC.df)
 
-      )
-      # remove values that irritate the meta-analysis
-      ln_data <- ln_data_full %>% dplyr::filter(is.finite(ln_SD))
-      # print warning, if necessary
-      if (nrow(ln_data_full) > nrow(ln_data)) {
-        print("data collection sites were removed, due to non-positive ln(C_SD)")
-      }
-      # run the meta-analysis
-      Het_C_SD <- metafor::rma.mv(yi = ln_SD,
-                                  V = SE_ln_SD^2,
-                                  random = ~ 1 | Data_Collection_Site,
-                                  method = method,
-                                  sparse = TRUE,
-                                  data = ln_data)
-      # insert the meta analysical results at the appropriate columns in the df
-      # transformations for Est_, Tau_ and /Tau2_ according to:
-      # https://stats.stackexchange.com/questions/241187/calculating-standard-deviation-after-log-transformation
-      MASC.df["Est__C_SD"] <- Model_Est_fun(as.numeric(Het_C_SD$b), Het_C_SD$sigma2)
-      MASC.df["Est__C_SD_K"] <- Het_C_SD$k
-      MASC.df["Tau2__C_SD"] <- Tau2_fun(as.numeric(Het_C_SD$b), Het_C_SD$sigma2)
-      MASC.df["Tau__C_SD"] <- sqrt(MASC.df["Tau2__C_SD"])
-      MASC.df["CoeffVar__C_SD"] <- MASC.df["Tau__C_SD"]/abs(MASC.df["Est__C_SD"])
-      MASC.df["I2__C_SD"] <- I2_fct(rma_mv_obj = Het_C_SD)
-      MASC.df["H2__C_SD"] <- H2_fct(rma_mv_obj = Het_C_SD)
-      MASC.df["QE__C_SD"] <- Het_C_SD$QE
-      MASC.df["QEp__C_SD"] <- Het_C_SD$QEp
-
-      rm(column_subset, ln_data, Het_C_SD)
-    }
 
     # 4 Heterogeneity of treatment group SD
-    if ( nrow(stats::na.omit(subset_MASC[, c("Data_Collection_Site", "T_N", "T_SD")])) <= 1) {} else {
-      # use the subset of columns relevant to this analysis
-      column_subset <- stats::na.omit(subset_MASC[, c("Data_Collection_Site", "T_N", "T_SD")])
-      # create df with ln data
-      ln_data_full <- data.frame(
-        Data_Collection_Site = column_subset$Data_Collection_Site,
-        ln_SD = ln_SD_fun(SD = column_subset$T_SD,
-                          n = column_subset$T_N),
-        SE_ln_SD = SE_lnSD_fun(n = column_subset$T_N)
+    MASC.df <- MetaPipeXUpdate:::ln_MA_subset(MASC_data = subset_MASC,
+                                              Data_Collection_Site = "Data_Collection_Site",
+                                              yi = "T_SD",
+                                              SE = "SE_T_SD",
+                                              N = "T_N",
+                                              method = method,
+                                              sparse = sparse,
+                                              MASC.df = MASC.df)
 
-      )
-      # remove values that irritate the meta-analysis
-      ln_data <- ln_data_full %>% dplyr::filter(is.finite(ln_SD))
-      # print warning, if necessary
-      if (nrow(ln_data_full) > nrow(ln_data)) {
-        print("data collection sites were removed, due to non-positive ln(T_SD)")
-      }
-      # run the meta-analysis
-      Het_T_SD <- metafor::rma.mv(yi = ln_SD,
-                                  V = SE_ln_SD^2,
-                                  random = ~ 1 | Data_Collection_Site,
-                                  method = method,
-                                  sparse = TRUE,
-                                  data = ln_data)
-      # insert the meta analysical results at the appropriate columns in the df
-      # transformations for Est_, Tau_ and /Tau2_ according to:
-      # https://stats.stackexchange.com/questions/241187/calculating-standard-deviation-after-log-transformation
-      MASC.df["Est__T_SD"] <- Model_Est_fun(as.numeric(Het_T_SD$b), Het_T_SD$sigma2)
-      MASC.df["Est__T_SD_K"] <- Het_T_SD$k
-      MASC.df["Tau2__T_SD"] <- Tau2_fun(as.numeric(Het_T_SD$b), Het_T_SD$sigma2)
-      MASC.df["Tau__T_SD"] <- sqrt(MASC.df["Tau2__T_SD"])
-      MASC.df["CoeffVar__T_SD"] <- MASC.df["Tau__T_SD"]/abs(MASC.df["Est__T_SD"])
-      MASC.df["I2__T_SD"] <- I2_fct(rma_mv_obj = Het_T_SD)
-      MASC.df["H2__T_SD"] <- H2_fct(rma_mv_obj = Het_T_SD)
-      MASC.df["QE__T_SD"] <- Het_T_SD$QE
-      MASC.df["QEp__T_SD"] <- Het_T_SD$QEp
-
-      rm(column_subset, ln_data, Het_T_SD)
-    }
 
     # 5 Heterogeneity of mean difference
-    if ( nrow(stats::na.omit(subset_MASC[, c("Data_Collection_Site", "MD", "SE_MD")])) <= 1 ) {} else {
-      # run the meta-analysis
-      Het_MD <- metafor::rma.mv(yi = MD,
-                                V = SE_MD^2,
-                                random = ~ 1 | Data_Collection_Site,
-                                method = method,
-                                sparse = sparse,
-                                data = stats::na.omit(subset_MASC[, c("Data_Collection_Site", "MD", "SE_MD")]))
-      # insert the meta analysical results at the appropriate columns in the df
-      MASC.df["Est__MD"] <- as.vector(Het_MD$b)
-      MASC.df["Est__MD_K"] <- Het_MD$k
-      MASC.df["Tau2__MD"] <- Het_MD$sigma2
-      MASC.df["Tau__MD"] <- sqrt(Het_MD$sigma2)
-      MASC.df["CoeffVar__MD"] <- sqrt(Het_MD$sigma2)/abs(as.vector(Het_MD$b))
-      MASC.df["I2__MD"] <- I2_fct(rma_mv_obj = Het_MD)
-      MASC.df["H2__MD"] <- H2_fct(rma_mv_obj = Het_MD)
-      MASC.df["QE__MD"] <- Het_MD$QE
-      MASC.df["QEp__MD"] <- Het_MD$QEp
+    MASC.df <- MetaPipeXUpdate:::standard_MA_subset(MASC_data = subset_MASC,
+                                                    Data_Collection_Site = "Data_Collection_Site",
+                                                    yi = "MD",
+                                                    SE = "SE_MD",
+                                                    method = method,
+                                                    sparse = sparse,
+                                                    MASC.df = MASC.df)
 
-      rm(Het_MD)
-    }
 
     # 6 Heterogeneity of pooled SD
-    if ( nrow(stats::na.omit(subset_MASC[, c("Data_Collection_Site", "T_N", "C_N", "pooled_SD")])) <= 1) {} else {
-      # use the subset of columns relevant to this analysis
-      column_subset <- stats::na.omit(subset_MASC[, c("Data_Collection_Site", "T_N", "C_N", "pooled_SD")])
-      # create df with ln data
-      ln_data_full <- data.frame(
-        Data_Collection_Site = column_subset$Data_Collection_Site,
-        ln_SD = ln_SD_fun(SD = column_subset$pooled_SD,
-                          n = column_subset$T_N + column_subset$C_N),
-        SE_ln_SD = SE_lnSD_fun(n =  column_subset$T_N + column_subset$C_N)
+    MASC.df <- MetaPipeXUpdate:::ln_MA_subset(MASC_data = subset_MASC,
+                                              Data_Collection_Site = "Data_Collection_Site",
+                                              yi = "pooled_SD",
+                                              SE = "SE_pooled_SD",
+                                              N = "C_N",
+                                              N_second_group = "T_N",
+                                              method = method,
+                                              sparse = sparse,
+                                              MASC.df = MASC.df)
 
-      )
-      # remove values that irritate the meta-analysis
-      ln_data <- ln_data_full %>% dplyr::filter(is.finite(ln_SD))
-      # print warning, if necessary
-      if (nrow(ln_data_full) > nrow(ln_data)) {
-        print("data collection sites were removed, due to non-positive ln(pooled_SD)")
-      }
-      # run the meta-analysis
-      Het_pooled_SD <- metafor::rma.mv(yi = ln_SD,
-                                       V = SE_ln_SD^2,
-                                       random = ~ 1 | Data_Collection_Site,
-                                       method = method,
-                                       sparse = TRUE,
-                                       data = ln_data)
-      # insert the meta analysical results at the appropriate columns in the df
-      # transformations for Est_, Tau_ and /Tau2_ according to:
-      # https://stats.stackexchange.com/questions/241187/calculating-standard-deviation-after-log-transformation
-      MASC.df["Est__pooled_SD"] <- Model_Est_fun(as.numeric(Het_pooled_SD$b), Het_pooled_SD$sigma2)
-      MASC.df["Est__pooled_SD_K"] <- Het_pooled_SD$k
-      MASC.df["Tau2__pooled_SD"] <- Tau2_fun(as.numeric(Het_pooled_SD$b), Het_pooled_SD$sigma2)
-      MASC.df["Tau__pooled_SD"] <- sqrt(MASC.df["Tau2__pooled_SD"])
-      MASC.df["CoeffVar__pooled_SD"] <- MASC.df["Tau__pooled_SD"]/abs(MASC.df["Est__pooled_SD"])
-      MASC.df["I2__pooled_SD"] <- I2_fct(rma_mv_obj = Het_pooled_SD)
-      MASC.df["H2__pooled_SD"] <- H2_fct(rma_mv_obj = Het_pooled_SD)
-      MASC.df["QE__pooled_SD"] <- Het_pooled_SD$QE
-      MASC.df["QEp__pooled_SD"] <- Het_pooled_SD$QEp
-
-      rm(column_subset, ln_data, Het_pooled_SD)
-    }
 
     # 7 Heterogeneity of effect size g (Borenstein)
-    if ( nrow(stats::na.omit(subset_MASC[, c("Data_Collection_Site", "SMD", "SE_SMD")])) <= 1 ) {} else {
-      # run the meta-analysis
-      Het_SMD <- metafor::rma.mv(yi = SMD,
-                                 V = SE_SMD^2,
-                                 random = ~ 1 | Data_Collection_Site,
-                                 method = method,
-                                 sparse = sparse,
-                                 data = stats::na.omit(subset_MASC[, c("Data_Collection_Site", "SMD", "SE_SMD")]))
-      # insert the meta analysical results at the appropriate columns in the df
-      MASC.df["Est__SMD"] <- as.vector(Het_SMD$b)
-      MASC.df["Est__SMD_K"] <- Het_SMD$k
-      MASC.df["Tau2__SMD"] <- Het_SMD$sigma2
-      MASC.df["Tau__SMD"] <- sqrt(Het_SMD$sigma2)
-      MASC.df["CoeffVar__SMD"] <- sqrt(Het_SMD$sigma2)/abs(as.vector(Het_SMD$b))
-      MASC.df["I2__SMD"] <- I2_fct(rma_mv_obj = Het_SMD)
-      MASC.df["H2__SMD"] <- H2_fct(rma_mv_obj = Het_SMD)
-      MASC.df["QE__SMD"] <- Het_SMD$QE
-      MASC.df["QEp__SMD"] <- Het_SMD$QEp
-
-      rm(Het_SMD)
-    }
+    MASC.df <- MetaPipeXUpdate:::standard_MA_subset(MASC_data = subset_MASC,
+                                                    Data_Collection_Site = "Data_Collection_Site",
+                                                    yi = "SMD",
+                                                    SE = "SE_SMD",
+                                                    method = method,
+                                                    sparse = sparse,
+                                                    MASC.df = MASC.df)
 
     # add descriptive columns
     descriptive_columns <- data.frame(MultiLab = unique(subset_MASC$MultiLab),
@@ -519,8 +383,6 @@ meta_analyze_MASCs <- function(data, output_folder = NULL, suppress_list_output 
 
   # create output df from list object
   meta_analyses <- dplyr::bind_rows(lapply(nested_list_output, function(x){dplyr::bind_rows(x)}))
-
-  meta_analyses <<- meta_analyses
 
   ### Create codebook
 
